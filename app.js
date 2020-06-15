@@ -21,9 +21,6 @@ const seedDatabase = require("./utils/seedDatabase");
 // Our database instance;
 const db = require("./database");
 
-// Our apiRouter
-const apiRouter = require("./routes/index");
-
 // A helper function to sync our database;
 const syncDatabase = () => {
   if (process.env.NODE_ENV === "production") {
@@ -32,7 +29,7 @@ const syncDatabase = () => {
     console.log("As a reminder, the forced synchronization option is on");
     db.sync({ force: true })
       .then(() => seedDatabase())
-      .catch((err) => {
+      .catch(err => {
         if (err.name === "SequelizeConnectionError") {
           createLocalDatabase();
           seedDatabase();
@@ -50,12 +47,14 @@ const app = express();
 const configureApp = () => {
   app.use(helmet());
   app.use(logger("dev"));
+  // handle request data:
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(compression());
   app.use(cookieParser());
 
-  app.use(express.static(path.join(__dirname, "public")));
+  // Our apiRouter
+  const apiRouter = require("./routes/index");
 
   // Mount our apiRouter
   app.use("/api", apiRouter);
